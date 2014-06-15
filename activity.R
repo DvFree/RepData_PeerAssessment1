@@ -1,8 +1,3 @@
-# Reproducible Research: Peer Assessment 1
-
-
-## Loading and preprocessing the data
-```{r}
 ## Import & Processing
 library(plyr)
 library(ggplot2)
@@ -13,25 +8,20 @@ initial = read.csv("activity.csv", nrows=400, na.strings="NA")
 classes = sapply(initial, class)
 a = read.csv("activity.csv", colClasses=classes)
 a$date = as.Date(a$date, "%Y-%m-%d")
-```
 
-## What is mean total number of steps taken per day?
-```{r}
-## Mean & Median
 ## Histogram
 a.1 = a[complete.cases(a),]
 a.1 = ddply(a.1, .(date), summarize, sum=sum(steps))
 q.1 = qplot(sum, data=a.1, binwidth=2000, xlab="Steps Per Day", ylab="Frequency")
 print(q.1)
+
+## Mean & Median
 mean.steps = mean(a.1$sum)
 print(c("Average number of steps:", mean.steps))
 median.steps = median(a.1$sum)
 print(c("Median number of steps:", median.steps))
-```
 
-
-## What is the average daily activity pattern?
-```{r}
+## Average Daily Activity Pattern
 a.2 = ddply(a, .(interval), summarize, mean(steps, na.rm=TRUE))
 names(a.2) = c("interval", "meansteps")
 g.1 = ggplot(a.2, aes(interval, meansteps))
@@ -45,11 +35,7 @@ print(c("Highest Average Number of Steps per 5-minute interval:", max.meansteps)
 ## Count of Missing Values
 bad = is.na(a$steps)
 num.NAs = length(bad[bad==TRUE])
-```
 
-
-## Imputing missing values
-```{r}
 ## Impute New Values
 impute = function(x) replace(x, is.na(x), mean(x, na.rm=TRUE))
 a = ddply(a, ~ interval, transform, steps= impute(steps))
@@ -76,10 +62,8 @@ a.4 = ddply(a, .(interval, weekday), summarize, mean(steps))
 names(a.4) = c("interval", "weekday", "meansteps")
 g.2 = ggplot(a.4, aes(interval, meansteps)) + geom_line() + facet_grid(. ~ weekday) + xlab("Interval") + ylab("Number of steps")
 print(g.2)
-```
-## Are there differences in activity patterns between weekdays and weekends?
+
 ##Print Plots to Files
-```{r}
 dev.off()
 
 png("plot1.png")
@@ -97,4 +81,3 @@ dev.off()
 png("plot4.png")
 print(g.2)
 dev.off()
-```
